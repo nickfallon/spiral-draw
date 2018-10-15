@@ -1,0 +1,21 @@
+
+/* prevent flicker on touch screens */
+* {  
+	-webkit-backface-visibility:  hidden;
+    -webkit-tap-highlight-color:  transparent;
+}
+
+body, html {
+    padding: 0;
+    margin: 0;
+    background-color: #000000;
+    background-repeat: repeat;
+    color:#ffffff;    
+    overflow: hidden;
+    cursor: crosshair;
+    font-family: Sans-Serif;   
+}
+
+.blur {
+	 -webkit-filter: blur(5px);
+}

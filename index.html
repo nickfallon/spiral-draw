@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>skel</title>		
+  		<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+		<link href="css/style.css?v=1" rel="stylesheet" type="text/css">		
+		<script type="text/javascript" src="js/touch.js"></script>
+			<script type="text/javascript" src="js/stats.min.js"></script>
+			
+			<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+	
+			<style>
+			body {
+				font-family: 'Roboto', sans-serif;
+			}
+			
+			</style>
+	</head>
+	
+	<body>
+		
+		<canvas id="canvas1"></canvas>
+
+		<script>
+
+			var canvas;
+			var ctx;
+			var canvas_width;
+			var canvas_height;
+			var origin_x;
+			var origin_y;
+
+
+			(function() {
+				init();
+			})();
+
+			function init() {
+			
+				canvas = document.getElementById("canvas1");
+				ctx = canvas.getContext("2d");
+				resize_window();
+
+				bind_touch(canvas);
+				bind_mouse(canvas);
+
+				var stats = new Stats();
+				stats.showPanel(0); 
+				document.body.appendChild(stats.dom);
+
+				//clear canvas
+				ctx.fillStyle = 'rgba(0,0,0,1)';
+				ctx.fillRect(0, 0, canvas_width, canvas_height);
+
+				//set up animation 
+				window.requestAnimFrame = (function() {
+					return  window.requestAnimationFrame     ||
+					      window.webkitRequestAnimationFrame ||
+					      window.mozRequestAnimationFrame    ||
+					      function( callback ){
+					        window.setTimeout(callback, 1000 / 60);
+					      };
+				})();
+
+			    (function loop() {
+
+				    requestAnimFrame(loop);
+
+				    stats.begin();
+
+					animate();
+					render();
+
+					stats.end();
+
+				})();
+
+			}
+
+			function animate() {
+
+				damp_swipes();
+				handle_swipe_events();
+
+			}
+
+			function render() {		
+
+				ctx.fillStyle = '#ffffff';
+				ctx.strokeStyle = '#ffffff';
+
+				//draw points if mouse click or touch
+			
+				var points = 12;
+				if (cursor_down) {				
+					for (var i=0;i<points;i++){					
+						var o = getPoint(i, points, cursor_x_old, cursor_y_old);
+						var p = getPoint(i, points, cursor_x, cursor_y);
+						ctx.beginPath();
+						ctx.moveTo(o.x,o.y);
+						ctx.lineTo(p.x,p.y);
+						ctx.stroke();
+					}				
+				}
+				
+			}
+
+			function getPoint (i, points, cx, cy) {
+				var dx = cx - origin_x;
+				var dy = cy - origin_y;
+				var dist = Math.sqrt( dx*dx + dy*dy );
+				var a = Math.atan2(dx,dy);
+				var ix = a + (Math.PI * 2 / points) * i;
+				var tx = Math.floor(origin_x + Math.sin(ix) * dist);
+				var ty = Math.floor(origin_y + Math.cos(ix) * dist);
+				return { x: tx, y: ty};
+			}
+
+			window.onresize = resize_window;
+			function resize_window() {
+			    canvas_width = document.documentElement.clientWidth;
+			    canvas_height = document.documentElement.clientHeight;
+			    origin_x = Math.floor(canvas_width / 2);
+			    origin_y = Math.floor(canvas_height / 2);
+			    canvas.setAttribute("width", canvas_width);
+			    canvas.setAttribute("height", canvas_height);
+			}
+
+		</script>
+	</body>
+</html>
